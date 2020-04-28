@@ -1,6 +1,6 @@
 ---
 layout: page
-title: The Data Model
+title: Drawing the World
 ---
 
 # Drawing the World
@@ -49,12 +49,12 @@ Now our module calls a `draw` method on the `sim` view object, but we haven't im
 
 ```js
 draw(world) {
-  // == EMPTY THE WORLD ==
+  // Empty the world
   for (let child of this.worldEl.children) {
     child.remove()
   }
 
-  // == DRAW THE AGENTS ==
+  // Draw the agents
   for (let agent of world.agents) {
     let agentEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
     agentEl.setAttribute('class', 'simulation-agent')
@@ -65,7 +65,7 @@ draw(world) {
     agentEl.setAttribute('r', agent.radius)
   }
 
-  // == DRAW THE BOUNDARIES ==
+  // Draw the bondaries
   for (let boundary of world.boundaries) {
     let boundaryEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
     boundaryEl.setAttribute('class', 'simulation-boundary')
@@ -79,13 +79,57 @@ draw(world) {
 }
 ```
 
+Finally let's add some very basic styling for the simulation element. Create a _simulation.css_ file and link to it from the _index.html_ file:
+
+_simulation.css:_
+```css
+/*== The UI Layout */
+body {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  align-items: center;
+}
+
+#simulation-section {
+  flex-grow: 1;
+}
+
+#simulation-world {
+  max-height: 95vh;
+}
+
+/*== The Simulation */
+.simulation-boundary {
+  stroke: gray;
+  stroke-width: 5px;
+}
+```
+
+_index.html:_
+```html
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flatten-The-Curve Simulation</title>
+  <link rel="stylesheet" href="simulation.css">
+</head>
+...
+```
+
+At this point, if we load the page in a browser we should see a dot surrounded by a box. Great! I mean, it's not very exciting, but it's a great start. Next, let's add in a few more agents and introduce the concept of time into our simulation.
+
 ## A Bit of Optimization
 
 Notice that our `draw` method starts by clearing out all of the elements it contains and then recreates all of those elements again. This feels like it will be really inefficient, so instead let's have the view keep track of these SVG elements. So that we can keep the view and the model classes decoupled, we're going to borrow the notion of "zipping" from Python (I don't think JS has any kind of zip function built in, but if it does, someone please [let me know](https://github.com/mjumbewu/flatten-curve-sim-narrative/issues)). When we zip two arrays, we end up with a new array that contains corresponding pairs from the source arrays. For example, say we have these two arrays:
 
 ```js
-array1 = [1, 2, 3]
-array2 = ['a', 'b', 'c']
+const array1 = [1, 2, 3]
+const array2 = ['a', 'b', 'c']
 ```
 
 Zipping these two arrays together would result in the following array:
@@ -188,41 +232,5 @@ export {
   SVGSimView
 }
 ```
-
-Finally let's add some very basic styling for the simulation element. Create a _simulation.css_ file and link to it from the _index.html_ file:
-
-_simulation.css:_
-```css
-body {
-  margin: 0;
-  padding: 0;
-}
-
-#simulation-world {
-  max-width: 100%;
-  max-height: 100vh;
-}
-
-.simulation-boundary {
-  stroke: gray;
-  stroke-width: 5px;
-}
-```
-
-_index.html:_
-```html
-<!DOCTYPE html>
-
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flatten-The-Curve Simulation</title>
-  <link rel="stylesheet" href="simulation.css">
-</head>
-...
-```
-
-At this point, if we load the page in a browser we should see a dot surrounded by a box. Great! I mean, it's not very exciting, but it's a great start. Next, let's add in a few more agents and introduce the concept of time into our simulation.
 
 ...
