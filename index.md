@@ -3,6 +3,8 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+title: Flatten-the-Curve Sim
+nav_order: 1
 ---
 
 # Flatten-the-Curve Simulation

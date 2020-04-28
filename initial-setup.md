@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Initial Setup
-nav_order: 1
+nav_order: 2
 ---
 
 # Initial Setup
