@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Drawing the World
+nav-order: 3
 ---
 
 # Drawing the World

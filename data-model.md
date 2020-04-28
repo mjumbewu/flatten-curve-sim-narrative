@@ -1,15 +1,16 @@
 ---
 layout: page
 title: The Data Model
+nav_order: 2
 ---
 
 # The Data Model
 
-**I should reference somewhere here the On The Media episode interview with Robert Axelrod: https://pca.st/episode/9ba60afd-a125-42b5-a69d-3a6d973e2c78?t=1918**
-
 > All models are approximations. Assumptions, whether implied or clearly stated, are never exactly true. _All models are wrong, but some models are useful_. So the question you need to ask is not "Is the model true?" (it never is) but "Is the model good enough for this particular application?"
 >
-> - George Box
+> &mdash; George Box
+
+The _On the Media_ podcast has a pretty good [interview with Joshua Epstein](https://pca.st/episode/9ba60afd-a125-42b5-a69d-3a6d973e2c78?t=1918) on models in the time of COVID-19 ("Model Behavior", _On the Media_, 2020 April 17). I recommend it.
 
 Let's describe a simple model to start with. We can complicate this model as we progress. The specific type of model we are going to build is an [agent-based model](https://en.wikipedia.org/wiki/Agent-based_model) (ABM). Generally, an ABM consists of many virtual "agents" that each represent some real-world individual or collective. These agents act and interact within a virtual world. Often, these agents are all similar to each other, but differ in some randomized ways. In spite of this randomness, over time, their interactions result in some consistent patterns.
 
