@@ -9,9 +9,7 @@ nav_order: 1
 
 # Flatten-the-Curve Simulation
 
-I saw [this article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) with a social
-distancing simulator on Washington Post (I don't remember who shared it, but whoever it was thank you!). I
-thought it would be fun to recreate!
+I saw [this article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) with a social distancing simulator on Washington Post (I don't remember who shared it, but whoever it was thank you!). I thought it would be fun to recreate!
 
 I put together a first draft that you can find [here](https://mjumbewu.github.io/flatten-curve-sim/firstdraft/step20.html). You can see the code for the steps I went through [in this GitHub repository](https://github.com/mjumbewu/flatten-curve-sim/tree/master/firstdraft). My goal with _this_ site that you're reading now is to clean up the code and take you through the steps that it takes to create a simulation like this in JavaScript.
 
@@ -19,7 +17,12 @@ I put together a first draft that you can find [here](https://mjumbewu.github.io
 
 Simulation is a helpful tool for exploring the variables that affect a phenomenon. As has been mentioned in many places in reference to the spread of COVID-19, humans have a poor intuitive understanding of exponential growth. I think there are many things about a pandemic that we have a pretty weak intuitive grasp on. Evolution has not prepared us well for comprehending the complexity of factors involved in something that happens so quickly to such a large portion of the planet.
 
-That said, what I’m building here isn't necessarily THEE ONE AND ONLY BEST model for COVID-19 transmission. It’s not going to necessarily be the thing that allows you to internalize the enormity of what’s going on. It's not so much that I think _this_ simulator is most important. Rather, I just want to introduce how one might approach building a simulator … in JavaScript.
+Simulation allows us to describe aspects of the world as we understand it and see what happens to the world as we let those aspects play out over time. In doing so we can see how things that we think of as simple local rules of interaction can have far-reaching effects. Then, changing the parameters of our model allows us to ask what-would-happen-if questions of that world. In the specific case of a model of people within the context of a pandemic, hopefully our simulation can help us get a better understanding of what can happen under situations like:
+- medical infrastructure with a finite capacity
+- varying degrees of respect for stay-home orders
+- timing around relaxing of mobility restrictions
+
+That said, what we're building here isn't necessarily the best model for COVID-19 transmission. It’s not going to necessarily be the thing that allows you to internalize the enormity of what’s going on. It's not so much that I think _this_ simulator is most important. Rather, I just want to introduce how one might approach building _a_ simulator … in JavaScript.
 
 Moreover, as I mentioned above, I enjoy creating models and simulations. I think it's fun, and I think it would be fun to share the technique with others.
 
