@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Drawing the World
+permalink: drawing-the-world
 nav_order: 4
 ---
 

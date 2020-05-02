@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Initial Setup
+permalink: initial-setup
 nav_order: 2
 ---
 

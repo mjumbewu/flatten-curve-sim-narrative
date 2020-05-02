@@ -1,6 +1,7 @@
 ---
 layout: page
 title: The Data Model
+permalink: data-model
 nav_order: 3
 ---
 
