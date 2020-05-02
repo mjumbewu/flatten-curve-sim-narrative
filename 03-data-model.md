@@ -35,10 +35,10 @@ export { Agent }
 _model.boundary.js:_
 ```js
 function Boundary(params) {
-  this.x0 = params.x0
-  this.y0 = params.y0
   this.x1 = params.x1
   this.y1 = params.y1
+  this.x2 = params.x2
+  this.y2 = params.y2
 }
 
 export { Boundary }

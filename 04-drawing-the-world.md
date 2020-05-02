@@ -18,7 +18,9 @@ class SVGSimView {
 }
 ```
 
-Then let's create a basic simulation world with a single agent and four walls, just to have something to draw. In the _main.js_ module, enter the following:
+Here we used a `class` with its own `constructor` method, instead of a constructor function as we did in the model modules. The difference is purely syntactic, but I felt that a constructor function would better suit the models. I think of the models as being more about data than about the behavior attached to that data, and the functional syntax seemed closer to the raw structure than the scaffolding of a class would. However, I retain the right to change my mind.
+
+Next, let's create a basic simulation world with a single agent and four walls, just to have something to draw. In the _main.js_ module, enter the following:
 
 ```js
 import { Agent } from './model.agent.js'
@@ -35,10 +37,10 @@ let agents = [
 ]
 
 let boundaries = [
-  new Boundary({x0: 0, y0: 0, x1: W, y1: 0}),
-  new Boundary({x0: W, y0: 0, x1: W, y1: H}),
-  new Boundary({x0: W, y0: H, x1: 0, y1: H}),
-  new Boundary({x0: 0, y0: H, x1: 0, y1: 0}),
+  new Boundary({x1: 0, y1: 0, x2: W, y2: 0}),
+  new Boundary({x1: W, y1: 0, x2: W, y2: H}),
+  new Boundary({x1: W, y1: H, x2: 0, y2: H}),
+  new Boundary({x1: 0, y1: H, x2: 0, y2: 0}),
 ]
 
 let world = new World({agents, boundaries})
@@ -51,12 +53,22 @@ Now our module calls a `draw` method on the `sim` view object, but we haven't im
 
 ```js
 draw(world) {
-  // Empty the world
+  // CLEAR THE DRAWING
+  // -----------------
+  // First, empty the drawing my removing any children of the <svg> element.
+  // Initially this element is empty (see your "index.html" file), so there
+  // won't be anything to remove, but on subsequent runs of this function, we
+  // may have children. You'll see how those children get created below.
   for (let child of this.worldEl.children) {
     child.remove()
   }
 
-  // Draw the agents
+  // DRAW THE AGENTS
+  // ---------------
+  // Loop through each one of the agents in the world, which is passed in as
+  // an argument to this function, and for each one create a <circle> element.
+  // Add each circle to the <svg> element, and set the circle attributes to
+  // reflect the position and size of the agent.
   for (let agent of world.agents) {
     let agentEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
     agentEl.setAttribute('class', 'simulation-agent')
@@ -67,16 +79,19 @@ draw(world) {
     agentEl.setAttribute('r', agent.radius)
   }
 
-  // Draw the bondaries
+  // DRAW THE BOUNDARIES
+  // -------------------
+  // Similar to the agents, loop through each of the boundaries in the world.
+  // Add a line to represent the boundary.
   for (let boundary of world.boundaries) {
     let boundaryEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
     boundaryEl.setAttribute('class', 'simulation-boundary')
     this.worldEl.appendChild(boundaryEl)
 
-    boundaryEl.setAttribute('x1', boundary.x0)
-    boundaryEl.setAttribute('y1', boundary.y0)
-    boundaryEl.setAttribute('x2', boundary.x1)
-    boundaryEl.setAttribute('y2', boundary.y1)
+    boundaryEl.setAttribute('x1', boundary.x1)
+    boundaryEl.setAttribute('y1', boundary.y1)
+    boundaryEl.setAttribute('x2', boundary.x2)
+    boundaryEl.setAttribute('y2', boundary.y2)
   }
 }
 ```
@@ -123,11 +138,13 @@ _index.html:_
 ...
 ```
 
-At this point, if we load the page in a browser we should see a dot surrounded by a box. Great! I mean, it's not very exciting, but it's a great start. Next, let's add in a few more agents and introduce the concept of time into our simulation.
+At this point, if we load the page in a browser we should see a dot surrounded by a box. Great! I mean, it's not very exciting, but it's a great start. In the next step we'll add in a few more agents and introduce the concept of time into our simulation. But first...
 
-## A Bit of Optimization
+## A Bit of Optimization (optional)
 
-Notice that our `draw` method starts by clearing out all of the elements it contains and then recreates all of those elements again. This feels like it will be really inefficient, so instead let's have the view keep track of these SVG elements. So that we can keep the view and the model classes decoupled, we're going to borrow the notion of "zipping" from Python (I don't think JS has any kind of zip function built in, but if it does, someone please [let me know](https://github.com/mjumbewu/flatten-curve-sim-narrative/issues)). When we zip two arrays, we end up with a new array that contains corresponding pairs from the source arrays. For example, say we have these two arrays:
+This bit is optional. The draw function will essentially have the same end-result either way. If you would like to skip straight to the next step, [feel free](introducing-time).
+
+Notice that our `draw` method starts by clearing out all of the elements it contains and then recreates all of those elements again. This feels like it will be really inefficient, so instead let's have the view keep track of these SVG elements. One way that we could do this is to set the element as an attribute on its corresponding agent/boundary object (e.g., `agent.el = agentEl`). However, we want to keep the view and the model classes decoupled, so instead we're going to borrow the notion of "zipping" from Python (I don't think JS has any kind of zip function built in, but if it does, someone please [let me know](https://github.com/mjumbewu/flatten-curve-sim-narrative/issues)). When we zip two arrays, we end up with a new array that contains corresponding pairs from the source arrays. For example, say we have these two arrays:
 
 ```js
 const array1 = [1, 2, 3]
@@ -151,7 +168,7 @@ zipLongest([1, 2, 3, 4, 5], ['a', 'b', 'c'])
 // [ [1, 'a'], [2, 'b'], [3, 'c'], [4, undefined], [5, undefined] ]
 ```
 
-Let's implement the `zipLongest` function in a _utils.js_ module:
+In our case we'll want the latter. Let's implement the `zipLongest` function in a new _utils.js_ module:
 
 _utils.js:_
 ```js
@@ -206,10 +223,10 @@ class SVGSimView {
       }
 
       boundaryEl = boundaryEl || this.makeBoundaryEl()
-      boundaryEl.setAttribute('x1', boundary.x0)
-      boundaryEl.setAttribute('y1', boundary.y0)
-      boundaryEl.setAttribute('x2', boundary.x1)
-      boundaryEl.setAttribute('y2', boundary.y1)
+      boundaryEl.setAttribute('x1', boundary.x1)
+      boundaryEl.setAttribute('y1', boundary.y1)
+      boundaryEl.setAttribute('x2', boundary.x2)
+      boundaryEl.setAttribute('y2', boundary.y2)
     }
   }
 
@@ -235,4 +252,8 @@ export {
 }
 ```
 
-...
+Great, that should be a little better. With the number of times that we'll end up calling this `draw` method each second, it will likely be worthwhile for it to be as efficient as reasonable.
+
+Now that we have a drawn world, let's introduce the concept of time!
+
+[Introducing Time](introducing-time){: .btn }
