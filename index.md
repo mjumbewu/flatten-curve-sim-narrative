@@ -39,6 +39,20 @@ Again, I will try to be clear about anything that I feel is not self-explanatory
 
 Lastly, I'm going to be explaining a number of things that I am far from an expert in. Sometimes I'll choose one technique over another because it's easier to explain or more comprehensible to learners. Other times I may choose one technique over another because I don't know any better. There's so much I either never learned or have learned and since forgotten about epidemiology, statistics, vector transformations, and even JavaScript. Suggestions and corrections are welcome -- let's say in the [GitHub Issues](https://github.com/mjumbewu/flatten-curve-sim-narrative/issues) for now.
 
+## Rough Outline
+
+Done so far...
+- [**Initial Setup**](initial-setup) -- Create an HTML document structure for the interface.
+- [**The Data Model**](data-model) -- Establish the data model (the types of objects, their general properties, and their relationships) that we'll use for the simulation.
+- [**Drawing the World**](drawing-the-world) -- Create methods to draw the data model to the UI.
+- [**Introducing Time**](introducing-time) -- Update the state of the simulation agents as time ticks on.
+
+Still to come...
+- **Colliding with Barriers** -- Getting the agents to stay within the boundaries of the world.
+- **Colliding with Other Agents** -- Making agents aware of when they come into contact with each other, and having them respond to those interactions.
+- **Introducing Infection** -- Adding the concept of infection to the model and simulation.
+- **Charting Stats About the World** -- Adding in chart-based visualizations of the aggregate properties of the world's agents.
+
 Ok, let's get started!
 
 [The Initial Setup](initial-setup){: .btn }
