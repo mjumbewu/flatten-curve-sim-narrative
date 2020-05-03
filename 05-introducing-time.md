@@ -43,6 +43,31 @@ Also, we need to initialize the `Agent` instance's `time`. In the constructor fu
 this.time = params.time || 0
 ```
 
+Quick note about how we're creating a copy of the `Agent`: Above we're using the [spread operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) (`...`). This allows us to basically say "insert all the properties of `this` object here". It provides a quick way to [make a copy](https://lucybain.com/blog/2018/js-es6-spread-operator/) of an object, leaving the original unmodified. Essentially, the following two statements are equivalent:
+
+```js
+// This statement (as above):
+return new Agent({
+  ...this,
+  x,
+  y,
+  time,
+})
+
+// Is equivalent to this statement:
+return new Agent({
+  x: this.x,  // <-- will be overridden below
+  y: this.y,  // <-- will be overridden below
+  radius: this.radius,
+  direction: this.direction,
+  speed: this.speed,
+  time: this.time,  // <-- will be overridden below
+  x: x,
+  y: y,
+  time: time,
+})
+```
+
 ## World Time
 
 Next we'll add a `step` method to the `World` that will mainly exist to step all of the world's component parts at the same time. In the _model.world.js_ module, add the following before the `export` statement:
