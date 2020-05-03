@@ -254,6 +254,8 @@ export {
 
 Great, that should be a little better. With the number of times that we'll end up calling this `draw` method each second, it will likely be worthwhile for it to be as efficient as reasonable.
 
+----------
+
 Now that we have a drawn world, let's introduce the concept of time!
 
 [Introducing Time](introducing-time){: .btn }

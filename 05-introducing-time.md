@@ -11,7 +11,7 @@ This simulation isn't very exciting right now. One of the biggest reasons is tha
 
 ## Agent Time
 
-To manage time, we will add a `step` method to anything that will change in the simulation, starting with the `Agent`s. Each time `step` is called, the `Agent` will step forward in time by some amount (`Δt`, where delta (Δ) is often used to denote the amount of change in some property; also I thought it would be fun to use a non-ascii character in these variable names). We can use the agent's `direction` and `speed` to calculate the agent's new `x` and `y` coordinates. We use `cos` to get the change in the horizontal direction, and `sin` to get the change in the vertical direction ([sohcahtoa, sohcahtoa, sohcahtoa](https://www.mathsisfun.com/algebra/sohcahtoa.html)).
+To manage time, we will add a `step` method to anything that will change in the simulation, starting with the `Agent`s. Each time `step` is called, the `Agent` will step forward in time by some amount (`Δt`, where delta (Δ) is often used to denote the amount of change in some property; also I thought it would be fun to [use a non-ascii character](https://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names) in these variable names). We can use the agent's `direction` and `speed` to calculate the agent's new `x` and `y` coordinates. We use `cos` to get the change in the horizontal direction, and `sin` to get the change in the vertical direction ([sohcahtoa, sohcahtoa, sohcahtoa](https://www.mathsisfun.com/algebra/sohcahtoa.html)).
 
 In the _model.agent.js_ module, add the following before the `export` statement:
 
@@ -201,3 +201,5 @@ let agents = Array(100)
     })
   )
 ```
+
+----------

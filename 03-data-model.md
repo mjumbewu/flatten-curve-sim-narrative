@@ -75,4 +75,8 @@ Finally, let's add a `script` tag to the bottom of our page to import the main m
 </html>
 ```
 
+----------
+
+In the next step we are going to apply the data model that we've created to the DOM to visualize our world.
+
 [Drawing the World](drawing-the-world){: .btn }

@@ -53,6 +53,8 @@ Still to come...
 - **Introducing Infection** -- Adding the concept of infection to the model and simulation.
 - **Charting Stats About the World** -- Adding in chart-based visualizations of the aggregate properties of the world's agents.
 
+----------
+
 Ok, let's get started!
 
 [The Initial Setup](initial-setup){: .btn }
