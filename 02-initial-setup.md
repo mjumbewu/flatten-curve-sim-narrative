@@ -62,3 +62,7 @@ We're going to start with the simulation section first, so we'll just leave a st
   ```
 
   There are a few ways that we could choose to draw the dots in our simulation: using SVG, using a canvas element, or using something like WebGL. That list is probably in order of difficulty. There are [tradeoffs](http://dataquarium.io/svg-canvas-webgl/) in either case. For the sake of relative simplicity, we're going to use SVG elements. Using SVG is also going to help us with visibility into what our code is doing later. If we play our cards right, it should be pretty simple to switch out for either of the other choices down the line.
+
+  Next we're going to describe the basic aspects of the data model that we're going to use as the basis of our simulated world.
+
+  [The Data Model](data-model){: .btn }
