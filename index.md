@@ -9,9 +9,9 @@ nav_order: 1
 
 # Flatten-the-Curve Simulation
 
-I saw [this article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) with a social distancing simulator on Washington Post (I don't remember who shared it, but whoever it was thank you!). I thought it would be fun to recreate!
+I read [this article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) with a social distancing simulator on Washington Post a few weeks back (I don't remember who shared it, but whoever it was thank you!). I thought it would be fun to recreate using vanilla JavaScript!
 
-I put together a first draft that you can find [here](https://mjumbewu.github.io/flatten-curve-sim/firstdraft/step20.html). You can see the code for the steps I went through [in this GitHub repository](https://github.com/mjumbewu/flatten-curve-sim/tree/master/firstdraft). My goal with _this_ site that you're reading now is to clean up the code and take you through the steps that it takes to create a simulation like this in JavaScript.
+I put together a first draft that you can find [here](https://mjumbewu.github.io/flatten-curve-sim/firstdraft/step20.html). I also found the [Simulating an epidemic](https://www.youtube.com/watch?v=gxAaO2rsdIs) video from 3Blue1Brown very helpful in thinking about approaches to the model. You can see the code for the steps I went through [in this GitHub repository](https://github.com/mjumbewu/flatten-curve-sim/tree/master/firstdraft). My goal with _this_ site that you're reading now is to clean up the code and take you through the steps that it takes to create a simulation like this in JavaScript.
 
 ## Why?
 
