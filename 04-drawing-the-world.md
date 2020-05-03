@@ -45,8 +45,8 @@ let boundaries = [
 
 let world = new World({agents, boundaries})
 
-let sim = new SVGSimView({ el })
-sim.draw(world)
+let simview = new SVGSimView({ el })
+simview.draw(world)
 ```
 
 Now our module calls a `draw` method on the `sim` view object, but we haven't implemented this method yet. What we want the `draw` method to do is sync up the `agents` and `boundaries` in our world to SVG elements in our simulation image. In the `SVGSimView` class, let's insert the following method:
