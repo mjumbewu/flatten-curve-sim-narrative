@@ -21,12 +21,14 @@ Now we can start coding this simple data model. Let's create a separate [JS modu
 
 _model.agent.js:_
 ```js
-function Agent(params) {
-  this.x = params.x
-  this.y = params.y
-  this.radius = params.radius
-  this.direction = params.direction
-  this.speed = params.speed
+class Agent {
+  constructor(params) {
+    this.x = params.x
+    this.y = params.y
+    this.radius = params.radius
+    this.direction = params.direction
+    this.speed = params.speed
+  }
 }
 
 export { Agent }
@@ -34,11 +36,13 @@ export { Agent }
 
 _model.boundary.js:_
 ```js
-function Boundary(params) {
-  this.x1 = params.x1
-  this.y1 = params.y1
-  this.x2 = params.x2
-  this.y2 = params.y2
+class Boundary{
+  constructor(params) {
+    this.x1 = params.x1
+    this.y1 = params.y1
+    this.x2 = params.x2
+    this.y2 = params.y2
+  }
 }
 
 export { Boundary }
@@ -46,11 +50,12 @@ export { Boundary }
 
 _model.world.js:_
 ```js
-function World(params) {
-  this.agents = params.agents
-  this.boundaries = params.boundaries
+class World {
+  constructor(params) {
+    this.agents = params.agents
+    this.boundaries = params.boundaries
+  }
 }
-
 export { World }
 ```
 
@@ -62,6 +67,8 @@ import { Agent } from './model.agent.js'
 import { Boundary } from './model.boundary.js'
 import { World } from './model.world.js'
 ```
+
+Here we used `class`es, each with their own `constructor` method, instead of using a constructor function as is common in JavaScript. The difference is purely syntactic, but we may want to add some properties down the line that I think are cleaner with this syntax.
 
 Finally, let's add a `script` tag to the bottom of our page to import the main module.
 

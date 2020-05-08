@@ -18,8 +18,6 @@ class SVGSimView {
 }
 ```
 
-Here we used a `class` with its own `constructor` method, instead of a constructor function as we did in the model modules. The difference is purely syntactic, but I felt that a constructor function would better suit the models. I think of the models as being more about data than about the behavior attached to that data, and the functional syntax seemed closer to the raw structure than the scaffolding of a class would. However, I retain the right to change my mind.
-
 Next, let's create a basic simulation world with a single agent and four walls, just to have something to draw. In the _main.js_ module, enter the following:
 
 ```js
