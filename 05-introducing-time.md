@@ -13,10 +13,10 @@ This simulation isn't very exciting right now. One of the biggest reasons is tha
 
 To manage time, we will add a `step` method to anything that will change in the simulation, starting with the `Agent`s. Each time `step` is called, the `Agent` will step forward in time by some amount (`Δt`, where delta (Δ) is often used to denote the amount of change in some property; also I thought it would be fun to [use a non-ascii character](https://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names) in these variable names). We can use the agent's `direction` and `speed` to calculate the agent's new `x` and `y` coordinates. We use `cos` to get the change in the horizontal direction, and `sin` to get the change in the vertical direction ([sohcahtoa, sohcahtoa, sohcahtoa](https://www.mathsisfun.com/algebra/sohcahtoa.html)).
 
-In the _model.agent.js_ module, add the following before the `export` statement:
+In the _model.agent.js_ module, add the following at the bottom inside of the `Agent` class:
 
 ```js
-Agent.prototype.step = function(Δt=1) {
+step(Δt=1) {
   const Δx = Math.cos(this.direction) * this.speed * Δt
   const Δy = Math.sin(this.direction) * this.speed * Δt
 
@@ -70,10 +70,10 @@ return new Agent({
 
 ## World Time
 
-Next we'll add a `step` method to the `World` that will mainly exist to step all of the world's component parts at the same time. In the _model.world.js_ module, add the following before the `export` statement:
+Next we'll add a `step` method to the `World` that will mainly exist to step all of the world's component parts at the same time. In the _model.world.js_ module, add the following at the bottom inside of the `World` class:
 
 ```js
-World.prototype.step = function(Δt=1) {
+step(Δt=1) {
   const agents = this.agents.map(a => a.step(Δt))
   const time = this.time + Δt
 
@@ -228,3 +228,7 @@ let agents = Array(100)
 ```
 
 ----------
+
+If you reload the page now you'll note that all the dots just continue moving off the page. That's not visually interesting, nor, more importantly, does it serve the behavior we're trying to achieve in the model. So, let's make our agents bounce.
+
+[Interacting With Boundaries](interacting-with-boundaries){: .btn }
