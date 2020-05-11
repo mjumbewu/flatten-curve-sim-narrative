@@ -27,7 +27,7 @@ const π = Math.PI
 // on the object, but we'll add getters to quickly compute the magnitude and
 // direction from the x and y components if needed. We will also add a getter
 // for the unit of a vector (the vector with a magnitude of 1 in the same
-// direction), and a few function for doing vector arithmetic (addition,
+// direction), and a few functions for doing vector arithmetic (addition,
 // multiplication, and "dot product").
 class Vector {
   constructor(Δx, Δy) {
@@ -81,6 +81,13 @@ class Vector {
     return new Vector(
       this.Δx + other.Δx,
       this.Δy + other.Δy,
+    )
+  }
+
+  minus(other) {
+    return new Vector(
+      this.Δx - other.Δx,
+      this.Δy - other.Δy,
     )
   }
 
@@ -145,13 +152,37 @@ class Segment {
 export { Point, Segment, Vector }
 ```
 
+We may revisit these later on for some optimizations, but for now we're ready to start making some agents bounce off the walls!
+
+## Making an `Agent` Bounce
+
+What we want to happen is, when an `Agent` hits a `Boundary`, the agent should bounce off of it.
+
+Hm.
+
+If you've ever done something like [instruct a robot to make a peanut butter and jelly sandwich](https://www.scientificamerican.com/article/robot-make-me-a-sandwich/), then you know that we haven't described what should happen in nearly enough detail yet. So we'll try again:
+
+For a given `Agent` `a`, any time we call `a.step()`, `a` is moving in some direction with some speed. We'll call the `Vector` that could describe the agent's movement it's `velocity`, or `v` for short.
+
+**_insert an image here_**
+
+Most of the time, if there's nothing that's in agent `a`'s way, it should just be offset by the vector `v` over the course of a time step (that is, specifically, for a step that is 1 time unit long; generally for a step of `Δt` time units, the position of `a` should be offset by the vector `Δp = v .times (Δt)`).
+
+**_insert an image here_**
+
+However, sometimes there may be an obstacle in the way &mdash; specifically, in this case, a `Boundary`.
+
+**_insert an image here_**
+
+We can tell whether a given boundary `b` is in the way by checking for collisions between `a` and the `b`. A collision will happen when the path that `a` takes during the course of it's step (which we can describe with a `Segment`) crosses the boundary `b` (which we can describe by another `Segment`). Calculating whether two segments cross is definitely something defined well enough that we can get a computer to do it!
+
+----------
+
 Things to add:
 - `Point.offset` vector magnitude check
-- `magnitude` and `direction` caching
-- `Vector` constructor parameters `magnitude` and `direction`
 - `Vector.unit`, `plus`, and `times` magnitude optimizations
-- `Segment` `normal` constructor parameter
 - `Segment.normal` caching
+- `Segment` `normal` constructor null setting (because of JIT compiling)
 
 
 Outline:
