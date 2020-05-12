@@ -164,17 +164,17 @@ If you've ever done something like [instruct a robot to make a peanut butter and
 
 For a given `Agent` `a`, any time we call `a.step()`, `a` is moving in some direction with some speed. We'll call the `Vector` that could describe the agent's movement it's `velocity`, or `v` for short.
 
-**_insert an image here_**
+![An agent with its velocity vector](images/agent_bounce_01_velocity.jpg){: .illustration}
 
-Most of the time, if there's nothing that's in agent `a`'s way, it should just be offset by the vector `v` over the course of a time step (that is, specifically, for a step that is 1 time unit long; generally for a step of `Δt` time units, the position of `a` should be offset by the vector `Δp = v .times (Δt)`).
+Most of the time, if there's nothing that's in agent `a`'s way, it should just be offset by the vector `v` over the course of a simulation step (that is, specifically, for a step that is 1 time unit long; generally for a step of `Δt` time units, the position of `a` should be offset by the vector `Δp = v .times (Δt)`).
 
-**_insert an image here_**
+![An agent offset after a step](images/agent_bounce_02_displacement.jpg){: .illustration}
 
-However, sometimes there may be an obstacle in the way &mdash; specifically, in this case, a `Boundary`.
+However, sometimes there may be an obstacle in the way &mdash; specifically, in this case, a `Boundary`. We can tell whether a given boundary `b` is in the way by checking for collisions between `a` and the `b`. A collision will happen when the path that `a` takes during the course of it's step (which we can describe with a `Segment`) crosses the boundary `b` (which we can describe by another `Segment`).
 
-**_insert an image here_**
+![An agent colliding with a boundary](images/agent_bounce_03_collision.jpg){: .illustration}
 
-We can tell whether a given boundary `b` is in the way by checking for collisions between `a` and the `b`. A collision will happen when the path that `a` takes during the course of it's step (which we can describe with a `Segment`) crosses the boundary `b` (which we can describe by another `Segment`). Calculating whether two segments cross is definitely something defined well enough that we can get a computer to do it!
+Calculating whether two segments cross is definitely something defined well enough that we can get a computer to do it!
 
 ----------
 
