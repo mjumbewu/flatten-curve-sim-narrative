@@ -281,7 +281,7 @@ _utils.js_:
 
 // Floating point math is, literally, the devil. So, let's use a threshold
 // of 6 decimal places for all of our numbers.
-function eq(a, b, t=0.000001) { return (a <= b + t && a >= b - t) }
+function eq(a, b, t=0.000001) { return (b - t <= a && a <= b + t) }
 function lte(a, b, t=0.000001) { return (a <= b + t) }
 function gte(a, b, t=0.000001) { return (a >= b - t) }
 
