@@ -17,12 +17,15 @@ In the _model.agent.js_ module, add the following at the bottom inside of the `A
 
 ```js
 step(Δt=1) {
+  // Calculate the change in position based on how much time has elapsed (Δt)
   const Δx = Math.cos(this.direction) * this.speed * Δt
   const Δy = Math.sin(this.direction) * this.speed * Δt
 
+  // Calculate new position
   const x = this.x + Δx
   const y = this.y + Δy
 
+  // Calculate the new time
   const time = this.time + Δt
 
   return new Agent({

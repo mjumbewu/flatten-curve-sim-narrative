@@ -54,7 +54,7 @@ class Vector {
 
 ## Point
 
-Next we'll add the definition of a `Point`. A point is simple: it's just an x and y coordinate. Add the following to the module:
+Next we'll add the definition of a `Point`. A point is simple: it's just an x and y coordinate. We'll also add the ability to get a copy of the point offset along some `Vector`. Add the following to the module:
 
 _geometry.js_:
 ```js
@@ -63,12 +63,19 @@ class Point {
     this.x = x
     this.y = y
   }
+
+  offset(vector) {
+    return new Point(
+      this.x + vector.Δx,
+      this.y + vector.Δy,
+    )
+  }
 }
 ```
 
 ## Segment
 
-Finally, a segment is also relatively simple: it is the portion of a line between two points.
+Finally, a segment is also relatively simple: it is the portion of a line between two points. As for `Point`, we're also going to add a method for creating a new, offset segment.
 
 _geometry.js_:
 ```js
@@ -76,6 +83,13 @@ class Segment {
   constructor(p1, p2) {
     this.p1 = p1
     this.p2 = p2
+  }
+
+  offset(vector) {
+    return new Segment(
+      this.p1.offset(vector),
+      this.p2.offset(vector),
+    )
   }
 }
 ```
@@ -320,15 +334,146 @@ contains(point) {
 }
 ```
 
+Now if we open out _test_segments.html_ page again, we should see values for both `s1.crosses(s2)` and `s2.crosses(s1)`.
+
+### Detecting Collisions
+
+Now that we have the math worked out for our segment crossing detector, we can use the functions we've created in our simulation steps. First let's update our models to use the geometric concepts. I'm going to post updates to the `Agent` and `Boundary` models below without much explanation, but I encourage you to read through the changes.
+
+_model.agent.js_:
+```js
+class Agent {
+  constructor(params) {
+    this.position = params.position || new Point(params.x, params.y)
+    this.velocity = params.velocity || new Vector(
+        Math.cos(direction) * magnitude,
+        Math.sin(direction) * magnitude,
+      ))
+    this.radius = params.radius
+    this.time = params.time || 0
+  }
+
+  get x() { return this.position.x }
+  get y() { return this.position.y }
+
+  step(Δt=1) {
+    // Calculate the change in position based on how much time has elapsed (Δt)
+    const Δp = this.velocity .times (Δt)
+
+    // Calculate new position
+    const position = this.position.offset(Δp)
+
+    // Calculate the new time
+    const time = this.time + Δt
+
+    return new Agent({
+      ...this,
+      position,
+      time,
+    })
+  }
+}
+```
+
+_model.boundary.js_:
+```js
+class Boundary {
+  constructor(params) {
+    this.segment = new Segment(
+      new Point(params.x1, params.y1),
+      new Point(params.x2, params.y2),
+    )
+  }
+
+  get x1() { return this.segment.x1 }
+  get y1() { return this.segment.y1 }
+  get x2() { return this.segment.x2 }
+  get y2() { return this.segment.y2 }
+}
+```
+
+Using these new and improved models, we can update our `World.step` method.
+
+```js
+step(Δt=1) {
+  let bounceIfCollided = (oldAgent, newAgent) => {
+    const path = new Segment(oldAgent.position, newAgent.position)
+
+    for (const boundary of this.boundaries) {
+      const threshold = boundary.segment
+      if (path.crosses(threshold)) {
+        console.log('Agent crossed a boundary and needs to bounce!')
+      }
+    }
+
+    return newAgent
+  }
+
+  const agents = this.agents.map(a => bounceIfCollided(a, a.step(Δt)))
+  const time = this.time + Δt
+
+  return new World({
+    ...this,
+    agents,
+    time,
+  })
+}
+```
+
+If you fire up your original page and open the JS console, you should see a message get logged every time one of your agents crosses a boundary. This is great in that it shows that our simulation knows when we _should_ bounce, but now we have to teach it _how_ to bounce.
+
+### Calculating a New Velocity After a Bounce
+
+We want our bounces to be modeled roughly after elastic collisions against a stationary object. This basically means that the agent's speed is going to be the same after colliding as before. What we have to calculate is the new direction.
+
+First, a quick primer on real-world collisions. If an ball collides with a stationary surface (i.e. the surface of an object with a much larger mass than the ball), a force will be exerted on the ball in a direction perpendicular (a.k.a., ["normal"](https://en.wikipedia.org/wiki/Normal_%28geometry%29)) to the surface. This is true regardless of the direction of approach of the ball, or where on the surface the ball hits. The vector with a length of 1 that corresponds to this perpendicular direction of force is known as the **normal** of the surface.
+
+**illustration**
+
+If the surface has curvature to it, then each point along the surface may have a different normal calculated as the vector that is perpendicular to the tangent of the surface at that point.
+
+**illustration**
+
+All of our boundaries are straight, so we don't have to worry about the curvature case (for now). If a ball collides with two surfaces simultaneously (say, at a corner) then we can add the normals of each of those surfaces at the points of collision to get the direction of force that will be applied to the ball.
+
+**illustration**
+
+Once we know the direction of force applied to the ball, we can determine the ball's after-bounce direction of motion. We can split the ball's velocity into a component that is parallel to the normal vector and a component that is perpendicular. Put most simply, we want a new `Vector` that maintains the component of the velocity that is perpendicular to the normal vector, but negates the parallel component.
+
+**illustration**
+
+This parallel component of the velocity is called the **projection** of the velocity onto the normal. To calculate the projection we can use an operation called the dot product. The dot product of two vectors `a` and `b`, usually written `a • b`, is defined as follows:
+
+```
+a • b = a.x * b.x + a.y * b.y
+```
+
+We'll also need to take something called a **unit vector** into account. A unit vector of a vector `a` is simply the vector of length 1 that has the same direction as `a`. We can calculate the unit vector by dividing each of `a`'s components by the total length, or **magnitude**, of `a` (written as `|a|`). We'll write the unit vector as `a¹`.
+
+```
+a¹ = a / |a|
+```
+
+It can be shown that the projection of a vector `a` onto another vector `b`  (let's write this as `a → b`) is equal to `b¹` times the dot product of `a` and `b` divided by the magnitude of `b`. The [derivation](http://www.sunshine2k.de/articles/Derivation_DotProduct_R2.pdf) of this is actually quite interesting, but I won't go over it here.
+
+```
+a → b = b¹ * (a • b) / |b|
+```
+
+Great! Now we have all the pieces we need to calculate our bounce.
+
+So, let's say we have the normal vector (`n`) to the boundary that exerts an [impulse](https://www.khanacademy.org/science/physics/linear-momentum/momentum-tutorial/a/what-are-momentum-and-impulse) (`i`) on an agent colliding with it. If we take the current velocity (`v`) of the agent, we can find the impulse applied to the agent by projecting the agent's velocity onto the normal and negating it (think of this as a form of [Newton's third law of motion](https://www.khanacademy.org/science/physics/forces-newtons-laws/newtons-laws-of-motion/a/what-is-newtons-third-law) &mdash; every action has an equal and opposite reaction). The final velocity (`vf`) of the agent can be calculated by adding the impulse vectors of everything that acts on the agent (e.g., the agent could collide with two boundaries at once), projecting the initial velocity onto the sum of impulse vectors, and scaling resulting vector by 2 so that the final velocity has the same magnitude as the agent's initial velocity (this of this as a kind of [conservation of momentum](https://www.khanacademy.org/science/physics/linear-momentum/momentum-tutorial/a/what-is-conservation-of-momentum)).
+
+```
+i = sum of (-v → n) for each collision
+vf = v + (v → i) * 2
+```
+
 ### Normal Vectors
 
 * In physics, a surface exerts a force perpendicular to itself. This direction is "normal".
 * Our sim is implementing physics-lite.
 * Add `normal` to `Boundary`
-
-### Calculating a New Velocity After a Bounce
-
-* Add a `bounce` method to `Agent`
 
 ----------
 
