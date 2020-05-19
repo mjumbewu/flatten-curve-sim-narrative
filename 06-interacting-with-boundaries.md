@@ -434,15 +434,15 @@ If the surface has curvature to it, then each point along the surface may have a
 
 **illustration**
 
-All of our boundaries are straight, so we don't have to worry about the curvature case (for now). If a ball collides with two surfaces simultaneously (say, at a corner) then we can add the normals of each of those surfaces at the points of collision to get the direction of force that will be applied to the ball.
+All of our boundaries are straight, so we don't have to worry about the curvature case &hellip; for now &#128527;. If a ball collides with two surfaces simultaneously (say, at a corner) then we can add the normals of each of those surfaces at the points of collision to get the direction of impact that will be applied to the ball (real physics is more nuanced than this, but the physics isn't even the main point of the model that we're building, so let's just get something that looks about right and move on).
 
 **illustration**
 
-Once we know the direction of force applied to the ball, we can determine the ball's after-bounce direction of motion. We can split the ball's velocity into a component that is parallel to the normal vector and a component that is perpendicular. Put most simply, we want a new `Vector` that maintains the component of the velocity that is perpendicular to the normal vector, but negates the parallel component.
+Once we know the direction of impact applied to the ball, we can determine the ball's after-bounce direction of motion. We can split the ball's velocity into a component that is parallel to the normal vector and a component that is perpendicular. We want a new `Vector` that maintains the component of the velocity that is perpendicular to the normal vector, but negates the parallel component.
 
 **illustration**
 
-This parallel component of the velocity is called the **projection** of the velocity onto the normal. To calculate the projection we can use an operation called the dot product. The dot product of two vectors `a` and `b`, usually written `a • b`, is defined as follows:
+This parallel component of the velocity is called the **projection** of the velocity onto the normal. To calculate the projection we can use an operation called the **dot product**. The dot product of two vectors `a` and `b`, usually written `a • b`, is defined as follows:
 
 ```
 a • b = a.x * b.x + a.y * b.y
@@ -466,25 +466,163 @@ So, let's say we have the normal vector (`n`) to the boundary that exerts an [im
 
 ```
 i = sum of (-v → n) for each collision
-vf = v + (v → i) * 2
+vf = v + (-v → i) * 2
 ```
 
-### Normal Vectors
+Great! Let's start implementing some of our new concepts. Just as a recap, here's the pieces we're going to use to bounce:
 
-* In physics, a surface exerts a force perpendicular to itself. This direction is "normal".
-* Our sim is implementing physics-lite.
-* Add `normal` to `Boundary`
+* The **magnitude** of a vector
+* The **unit** vector of a vector
+* The **normal** vector to a boundary
+* The **dot product** of two vectors
+* The **projection** of one vector onto another
 
-----------
+Let's get started.
 
-Things to add:
-- Explain what floating point arithmetic will do, and add `contains`
-- `Point.offset` vector magnitude check
-- `Vector.unit`, `plus`, and `times` magnitude optimizations
-- `Segment.normal` caching
-- `Segment` `normal` constructor null setting (because of JIT compiling)
+### Vector magnitude
 
+Add the following getter method to the `Vector` class:
+```js
+get magnitude() {
+  return Math.sqrt(this.Δx * this.Δx + this.Δy * this.Δy)
+}
+```
 
-Outline:
-* How do we know when an agent has collided with a boundary
-* What should we do when an agent collides with a boundary
+### Vector unit
+
+Add the following getter method to the `Vector` class:
+```js
+get unit() {
+  const magnitude = this.magnitude
+  if (magnitude === 1) { return this }
+  return new Vector(
+    this.Δx / magnitude,
+    this.Δy / magnitude,
+  )
+}
+```
+
+### Boundary normal
+
+Add the following getter method to the `Boundary` class:
+```js
+get normal() {
+  const x1 = this.segment.p1.x
+  const y1 = this.segment.p1.y
+  const x2 = this.segment.p2.x
+  const y2 = this.segment.p2.y
+
+  const orthogonal = new Vector(
+    y2 - y1,
+    x1 - x2,
+  )
+  return orthogonal.unit
+}
+```
+
+### Dot product of vectors
+
+Add the following method to the `Vector` class:
+```js
+dot(other) {
+  return this.Δx * other.Δx + this.Δy * other.Δy
+}
+```
+
+### Projection of one vector onto another
+
+Add the following method to the `Vector` class:
+```js
+projected(other) {
+  const magnitude = other.magnitude
+  return other .times (this.dot(other) / magnitude / magnitude)
+}
+```
+
+### Implementing `Agent.bounce`
+
+Finally, we can add a method for creating the post-bounce state of an `Agent`. We are going to add a `bounce` method to `Agent` that takes a set of normal vectors of the objects that the agent is bouncing off of, and constructs and returns a new `Agent` with a post-bounce velocity. that method looks like this:
+
+```js
+bounce(normals) {
+  if (normals.length === 0) { return this }
+
+  // Get the initial velocity vector
+  const v = this.velocity
+
+  // Construct an effective normal by projecting the velocity onto each of
+  // the collision normals, and then negating the resulting impact vectors.
+  // Think of this as a form of Newton's third law of motion -- every action
+  // has an equal and opposite reaction.
+  const n = normals
+    .map(n => v.projected(n))
+    .reduce((i1, i2) => i1 .minus (i2), new Vector(0, 0))
+
+  // The effective normal gives us the direction of impact on the agent. The
+  // agent's final velocity should have the same magnitude as the initial
+  // velocity -- think of this as a kind of conservation of momentum.
+  const i = v.projected(n) .times (-2)
+
+  // Calculate the new velocity vector
+  const velocity = v .plus (i)
+
+  return new Agent({
+    ...this,
+    velocity
+  })
+}
+```
+
+Holy smokes, we are so close here. Let's incorporate this into the `World.step` method:
+
+```js
+step(Δt=1) {
+  let bounceIfCollided = (oldAgent, newAgent) => {
+    const path = new Segment(oldAgent.position, newAgent.position)
+    const velocity = oldAgent.velocity
+    const radius = newAgent.radius
+
+    let collisionNormals = []
+    for (const boundary of this.boundaries) {
+      // First we figure out which side of the boundary the original agent
+      // center was on. There is a good explanation of why the following does
+      // that at https://math.stackexchange.com/a/274728/783341.
+      const side = ((oldAgent.x - boundary.x1) * (boundary.y2 - boundary.y1) -
+                    (oldAgent.y - boundary.y1) * (boundary.x2 - boundary.x1)) >= 0 ? 1 : -1
+
+      // We use that side to determine the correct orientation for our normal
+      // (because it matters if it's pointing toward the agent or away from
+      // it).
+      const normal = boundary.normal .times (side)
+
+      // If the dot product of the normal and the agent's velocity is not
+      // negative, then the agent is moving away from the boundary, and so
+      // shouldn't collide with it.
+      if (velocity.dot(normal) >= 0) { continue }
+
+      // Then we determine a threshold of how near the agent should be able
+      // to get to the boundary before we consider it a collision. We use the
+      // agent's radius to determine how far offset from the boundary the
+      // threshold should be.
+      const threshold = boundary.segment.offset(normal .times (radius))
+
+      // Finally, if the agent's path crosses that threshold, we collect the
+      // boundary's normal as one of the collision normals.
+      if (path.crosses(threshold)) {
+        collisionNormals.push(normal)
+      }
+    }
+
+    return newAgent.bounce(collisionNormals)
+  }
+
+  const agents = this.agents.map(a => bounceIfCollided(a, a.step(Δt)))
+  const time = this.time + Δt
+
+  return new World({
+    ...this,
+    agents,
+    time,
+  })
+}
+```
