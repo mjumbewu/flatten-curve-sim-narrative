@@ -392,24 +392,28 @@ class Boundary {
 }
 ```
 
-Using these new and improved models, we can update our `World.step` method.
+Using these new and improved models, we can update our `World.step` method. Instead of just creating a new array full of stepped agents, we're going to use the old and new state of each agent to detect a collision with any boundaries. We can create a function (let's call it `bounceAgentOffBoundaries`), inside of the `model.world.js` module, but outside of the `World` class, that takes an old and new agent state and a list of boundaries, and checks whether the moved agent collided with any of the boundaries. If it did, then the agent should bounce. But we haven't figured out how to determine the new direction of an agent after collision yet, so let's just put a placeholder in the new function.
+
+```js
+function bounceAgentOffBoundaries(oldAgent, newAgent, boundaries) {
+  const path = new Segment(oldAgent.position, newAgent.position)
+
+  for (const boundary of boundaries) {
+    const threshold = boundary.segment
+    if (path.crosses(threshold)) {
+      console.log('Agent crossed a boundary and needs to bounce!')
+    }
+  }
+
+  return newAgent
+}
+```
+
+Now we can update the `World.step` method to use this function:
 
 ```js
 step(Δt=1) {
-  let bounceIfCollided = (oldAgent, newAgent) => {
-    const path = new Segment(oldAgent.position, newAgent.position)
-
-    for (const boundary of this.boundaries) {
-      const threshold = boundary.segment
-      if (path.crosses(threshold)) {
-        console.log('Agent crossed a boundary and needs to bounce!')
-      }
-    }
-
-    return newAgent
-  }
-
-  const agents = this.agents.map(a => bounceIfCollided(a, a.step(Δt)))
+  const agents = this.agents.map(a => bounceAgentOffBoundaries(a, a.step(Δt), this.boundaries))
   const time = this.time + Δt
 
   return new World({
@@ -573,57 +577,46 @@ bounce(normals) {
 }
 ```
 
-Holy smokes, we are so close here. Let's incorporate this into the `World.step` method:
+Holy smokes, we are so close here. Let's incorporate this into the `bounceAgentOffBoundaries` method:
 
 ```js
-step(Δt=1) {
-  let bounceIfCollided = (oldAgent, newAgent) => {
-    const path = new Segment(oldAgent.position, newAgent.position)
-    const velocity = oldAgent.velocity
-    const radius = newAgent.radius
+function bounceAgentOffBoundaries(oldAgent, newAgent, boundaries) {
+  const path = new Segment(oldAgent.position, newAgent.position)
+  const velocity = oldAgent.velocity
+  const radius = newAgent.radius
 
-    let collisionNormals = []
-    for (const boundary of this.boundaries) {
-      // First we figure out which side of the boundary the original agent
-      // center was on. There is a good explanation of why the following does
-      // that at https://math.stackexchange.com/a/274728/783341.
-      const side = ((oldAgent.x - boundary.x1) * (boundary.y2 - boundary.y1) -
-                    (oldAgent.y - boundary.y1) * (boundary.x2 - boundary.x1)) >= 0 ? 1 : -1
+  let collisionNormals = []
+  for (const boundary of boundaries) {
+    // First we figure out which side of the boundary the original agent
+    // center was on. There is a good explanation of why the following does
+    // that at https://math.stackexchange.com/a/274728/783341.
+    const side = ((oldAgent.x - boundary.x1) * (boundary.y2 - boundary.y1) -
+                  (oldAgent.y - boundary.y1) * (boundary.x2 - boundary.x1)) >= 0 ? 1 : -1
 
-      // We use that side to determine the correct orientation for our normal
-      // (because it matters if it's pointing toward the agent or away from
-      // it).
-      const normal = boundary.normal .times (side)
+    // We use that side to determine the correct orientation for our normal
+    // (because it matters if it's pointing toward the agent or away from
+    // it).
+    const normal = boundary.normal .times (side)
 
-      // If the dot product of the normal and the agent's velocity is not
-      // negative, then the agent is moving away from the boundary, and so
-      // shouldn't collide with it.
-      if (velocity.dot(normal) >= 0) { continue }
+    // If the dot product of the normal and the agent's velocity is not
+    // negative, then the agent is moving away from the boundary, and so
+    // shouldn't collide with it.
+    if (velocity.dot(normal) >= 0) { continue }
 
-      // Then we determine a threshold of how near the agent should be able
-      // to get to the boundary before we consider it a collision. We use the
-      // agent's radius to determine how far offset from the boundary the
-      // threshold should be.
-      const threshold = boundary.segment.offset(normal .times (radius))
+    // Then we determine a threshold of how near the agent should be able
+    // to get to the boundary before we consider it a collision. We use the
+    // agent's radius to determine how far offset from the boundary the
+    // threshold should be.
+    const threshold = boundary.segment.offset(normal .times (radius))
 
-      // Finally, if the agent's path crosses that threshold, we collect the
-      // boundary's normal as one of the collision normals.
-      if (path.crosses(threshold)) {
-        collisionNormals.push(normal)
-      }
+    // Finally, if the agent's path crosses that threshold, we collect the
+    // boundary's normal as one of the collision normals.
+    if (path.crosses(threshold)) {
+      collisionNormals.push(normal)
     }
-
-    return newAgent.bounce(collisionNormals)
   }
 
-  const agents = this.agents.map(a => bounceIfCollided(a, a.step(Δt)))
-  const time = this.time + Δt
-
-  return new World({
-    ...this,
-    agents,
-    time,
-  })
+  return newAgent.bounce(collisionNormals)
 }
 ```
 
