@@ -626,3 +626,9 @@ step(Δt=1) {
   })
 }
 ```
+
+----------
+
+In the next section we'll go over how to detect agents' interactions with other agents.
+
+[Interacting With Other Agents](interacting-with-agents){: .btn}
