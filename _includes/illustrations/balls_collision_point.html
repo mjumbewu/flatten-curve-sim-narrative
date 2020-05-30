@@ -1,0 +1,38 @@
+<style>
+  #balls_collision_point .ball {
+    fill: none;
+    stroke: #000;
+  }
+
+  #balls_collision_point .balllabel {
+    font-weight: bold;
+    font-size: 3px;
+    font-family: sans-serif;
+  }
+
+  #balls_collision_point .collisionpoint {
+    fill: #e00;
+  }
+
+  #balls_collision_point .centerline {
+    stroke: #888;
+    stroke-dasharray: 1;
+    stroke-width: 0.5;
+  }
+</style>
+
+<svg id="balls_collision_point" class="illustration" viewBox="-40 -20 80 40">
+  <g class="container">
+    <text class="balllabel" x="-9" y="-16">a</text>
+    <line class="centerline" x1="-9" y1="-5" x2="0" y2="0" />
+    <circle class="ball" cx="-9" cy="-5" r="10" />
+    <circle class="ballcenter" cx="-9" cy="-5" r="0.5" />
+
+    <text class="balllabel" x="9" y="-6">b</text>
+    <line class="centerline" x1="9" y1="5" x2="0" y2="0" />
+    <circle class="ball" cx="9" cy="5" r="10" />
+    <circle class="ballcenter" cx="9" cy="5" r="0.5" />
+
+    <circle class="collisionpoint" cx="0" cy="0" r="1" />
+  </g>
+</svg>

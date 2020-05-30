@@ -1,0 +1,72 @@
+<style>
+  #ball_infinite_normals .ball {
+    fill: none;
+    stroke: #000;
+  }
+
+  #ball_infinite_normals .normal {
+    fill: #ea0;
+    stroke: #ea0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #ball_infinite_normals .centerline,
+  #ball_infinite_normals .tangentline {
+    stroke: #888;
+    stroke-dasharray: 1;
+    stroke-width: 0.5;
+  }
+</style>
+
+<svg id="ball_infinite_normals" class="illustration" viewBox="-40 -20 80 40">
+  <g class="container">
+    <line class="centerline" x1="0" y1="0" x2="10" y2="0" />
+    <circle class="ball" cx="0" cy="0" r="10" />
+    <line class="tangentline" x1="10.5" y1="-4.5" x2="10.5" y2="4.5" />
+    <g class="normal">
+      <line x1="11" y1="0" x2="18" y2="0" />
+      <path d="M 18,0 l -3,-2 l 0,4 z" />
+    </g>
+  </g>
+</svg>
+
+<script type="module">
+  const image = document.querySelector('#ball_infinite_normals');
+  const ball = document.querySelector('#ball_infinite_normals .ball');
+  const container = document.querySelector('#ball_infinite_normals .container');
+  let current_angle = 0;
+  let interval_id = null;
+
+  function angleWithRespectToBall(x, y) {
+    const bb = ball.getBoundingClientRect();
+
+    const client_x = bb.x + bb.width / 2.0;
+    const client_y = bb.y + bb.height / 2.0;
+    const client_r = bb.width / 2.0;
+
+    const x_offset = x - client_x;
+    const y_offset = y - client_y;
+    const angle = Math.atan(1.0 * y_offset / x_offset);
+
+    return (x_offset >= 0 ? angle : angle + Math.PI);
+  }
+
+  function updateNormalAngle(angle) {
+    container.setAttribute('transform', 'rotate(' + angle + ')');
+  }
+
+  function advanceNormalAngle() {
+    updateNormalAngle(current_angle++);
+  }
+
+  interval_id = setInterval(advanceNormalAngle, 50);
+
+  function trackMouseMotion(mouse_event) {
+    const angle = angleWithRespectToBall(mouse_event.x, mouse_event.y);
+    clearInterval(interval_id);
+    updateNormalAngle(angle * 180 / Math.PI);
+  }
+
+  image.addEventListener('mousemove', trackMouseMotion);
+</script>
