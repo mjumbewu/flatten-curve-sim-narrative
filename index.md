@@ -47,9 +47,9 @@ Done so far...
 - [**Drawing the World**](drawing-the-world) -- Create methods to draw the data model to the UI.
 - [**Introducing Time**](introducing-time) -- Update the state of the simulation agents as time ticks on.
 - [**Colliding with Barriers**](interacting-with-boundaries) -- Getting the agents to stay within the boundaries of the world.
+- [**Colliding with Other Agents**](interacting-with-agents) -- Making agents aware of when they come into contact with each other, and having them respond to those interactions.
 
 Still to come...
-- **Colliding with Other Agents** -- Making agents aware of when they come into contact with each other, and having them respond to those interactions.
 - **Introducing Infection** -- Adding the concept of infection to the model and simulation.
 - **Charting Stats About the World** -- Adding in chart-based visualizations of the aggregate properties of the world's agents.
 
